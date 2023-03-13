@@ -11,6 +11,10 @@ def filter_by_ascii_rate(text,threshold=0.9):
 def load_dataset(filename,n=5000,state=6):
     df = pd.read_csv(filename,sep='\t')
     
+    mapping = {1:0,2:0,4:1,5:1}
+    df = df[df.star_rating != 3]
+    df.star_rating = df.star_rating.map(mapping)
+    
     # extracts japanese text.
     is_jp = df.review_body.apply(filter_by_ascii_rate)
     df = df[is_jp]
@@ -26,24 +30,34 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-# 学習と評価を行う関数
-def train_and_eval(X_train,y_train,X_test,y_test,
-                   lowercase=False,tokenize=None,preprocessor=None):
+# # 学習と評価を行う関数
+# def train_and_eval(X_train,y_train,X_test,y_test,
+#                    lowercase=False,tokenize=None,preprocessor=None):
     
-    #　与えられたテキストデータをベクトル化
-    vectorizer = CountVectorizer(lowercase=lowercase,
-                                 tokenizer=tokenize,
-                                 preprocessor=preprocessor)
-    X_train_vec = vectorizer.fit_transform(X_train)
-    X_test_vec = vectorizer.transform(X_test)
+#     #　与えられたテキストデータをベクトル化
+#     vectorizer = CountVectorizer(lowercase=lowercase,
+#                                  tokenizer=tokenize,
+#                                  preprocessor=preprocessor)
+#     X_train_vec = vectorizer.fit_transform(X_train)
+#     X_test_vec = vectorizer.transform(X_test)
     
-    #　学習
-    # ロジスティック回帰を使用して、テキストデータを分類する
+#     #　学習
+#     # ロジスティック回帰を使用して、テキストデータを分類する
+#     clf = LogisticRegression(solver='liblinear')
+#     clf.fit(X_train_vec,y_train)
+    
+#     #　評価
+#     # テストデータのクラスラベルを予測し、予測の正確度を計算する
+#     y_pred = clf.predict(X_test_vec)
+#     score = accuracy_score(y_test,y_pred)
+#     print('{:.4f}'.format(score))
+
+
+def train_and_eval(X_train,y_train,X_test,y_test,vectorizer):
+    x_train_vec = vectorizer.fit_transform(X_train)
+    x_test_vec = vectorizer.transform(X_test)
     clf = LogisticRegression(solver='liblinear')
-    clf.fit(X_train_vec,y_train)
-    
-    #　評価
-    # テストデータのクラスラベルを予測し、予測の正確度を計算する
-    y_pred = clf.predict(X_test_vec)
+    clf.fit(x_train_vec,y_train)
+    y_pred = clf.predict(x_test_vec)
     score = accuracy_score(y_test,y_pred)
     print('{:.4f}'.format(score))
