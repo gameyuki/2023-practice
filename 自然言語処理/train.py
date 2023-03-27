@@ -1,34 +1,57 @@
-# from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-# from sklearn.model_selection import train_test_split
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
+from tensorflow.keras.models import load_model
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
 
-# from preprocessing import clean_html, normalize_number,tokenize
-# from utils import load_dataset, train_and_eval
+from model import create_model
+from preprocessing import clean_html,tokenize
+from utils import load_dataset, plot_history
 
-# def main():
-#     x,y = load_dataset('data/amazon_reviews_multilingual_JP_v1_00.tsv',n=5000)
+def main():
+    # データの読み込み
+    x,y = load_dataset('data/amazon_reviews_multilingual_JP_v1_00.tsv',n=5000)
     
-#     print('Tokenization')
-#     x = [clean_html(text,strip=True) for text in x]
-#     x = [''.join(tokenize(text)) for text in x]
-#     x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=42)
+    #　データの前処理
+    x = [clean_html(text,strip=True) for text in x]
+    x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=42)
     
-#     print('Binary')
-#     vectorizer = CountVectorizer(binary=True)
-#     train_and_eval(x_train,y_train,x_test,y_test,vectorizer)
+    #データセットのベクトル化
+    vectorizer = CountVectorizer(tokenizer=tokenize)
+    x_train = vectorizer.fit_transform(x_train)
+    x_test = vectorizer.transform(x_test)
+    x_train = x_train.toarray()
+    x_test = x_test.toarray()
     
-#     print('Count')
-#     vectorizer = CountVectorizer(binary=False)
-#     train_and_eval(x_train,y_train,x_test,y_test,vectorizer)
+    #ハイパーパラメータの設定
+    vocab_size = len(vectorizer.vocabulary_)
+    label_size = len(set(y_train))
     
-#     print('TF-IDF')
-#     vectorizer = TfidfVectorizer()
-#     train_and_eval(x_train,y_train,x_test,y_test,vectorizer)
+    #モデルの構築
+    model = create_model(vocab_size,label_size)
+    model.compile(loss='sparse_categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
     
-#     print('Bigram')
-#     vectorizer = TfidfVectorizer(ngram_range=(1,2))
-#     train_and_eval(x_train,y_train,x_test,y_test,vectorizer)
+    #コールバックの準備
+    filepath = 'model.h5'
+    callbacks = [
+        EarlyStopping(patience=3),
+        ModelCheckpoint(filepath,save_best_only=True),
+        TensorBoard(log_dir='logs')
+    ]
+    
+    #モデルの学習
+    history = model.fit(x_train,y_train,validation_split=0.2,epochs=100,batch_size=32,callbacks=callbacks)
+    
+    #モデルの読み込み
+    model = load_model(filepath)
+    
+    #モデルを使った予測
+    text = 'このアプリは超最高!'
+    vec = vectorizer.transform([text])
+    y_pred = model.predict(vec.toarray())
+    print(y_pred)
+    
+    #正解率と損失のグラフの描画
+    plot_history(history)
 
-# if __name__=='__main__':
-#     main()
-    
-    
+if __name__=='__main__':
+    main()

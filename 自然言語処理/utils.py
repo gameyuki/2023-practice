@@ -1,5 +1,6 @@
 import string
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # 日本語のレビューのみを抽出する関数
 def filter_by_ascii_rate(text,threshold=0.9):
@@ -61,3 +62,31 @@ def train_and_eval(X_train,y_train,X_test,y_test,vectorizer):
     y_pred = clf.predict(x_test_vec)
     score = accuracy_score(y_test,y_pred)
     print('{:.4f}'.format(score))
+    
+def plot_history(history):
+    #設定
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    acc = history.history['acc']
+    val_acc = history.history['val_acc']
+    epochs = range(1,len(loss)+1)
+    
+    #Plotting loss
+    plt.plot(epochs,loss,'r',label='Training loss')
+    plt.plot(epochs,val_loss,'b',label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    
+    plt.figure()
+    
+    #Plotting accuracy
+    plt.plot(epochs,acc,'r',label='Training acc')
+    plt.plot(epochs,val_acc,'b',label='Validation acc')
+    plt.title('Training and validation accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend(loc='lower right')
+    
+    plt.show()
