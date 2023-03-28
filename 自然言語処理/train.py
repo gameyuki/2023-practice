@@ -11,7 +11,7 @@ def main():
     # データの読み込み
     x,y = load_dataset('data/amazon_reviews_multilingual_JP_v1_00.tsv',n=5000)
     
-    #　データの前処理
+    # データの前処理
     x = [clean_html(text,strip=True) for text in x]
     x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=42)
     

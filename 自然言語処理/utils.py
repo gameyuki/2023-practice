@@ -67,8 +67,8 @@ def plot_history(history):
     #設定
     loss = history.history['loss']
     val_loss = history.history['val_loss']
-    acc = history.history['acc']
-    val_acc = history.history['val_acc']
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
     epochs = range(1,len(loss)+1)
     
     #Plotting loss
