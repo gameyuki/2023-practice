@@ -160,6 +160,6 @@ cython_debug/
 #.idea/
 
 amazon_reviews_multilingual_JP_v1_00.tsv
-*.tsv
-logs
-*.log
+#*.tsv
+#logs
+#*.log
