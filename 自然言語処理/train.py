@@ -45,7 +45,7 @@ def main():
     model = load_model(filepath)
     
     #モデルを使った予測
-    text = 'このアプリは超最高!'
+    text = '大阪電気通信大学!'
     vec = vectorizer.transform([text])
     y_pred = model.predict(vec.toarray())
     print(y_pred)
