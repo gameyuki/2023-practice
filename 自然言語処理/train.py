@@ -50,6 +50,9 @@ def main():
     y_pred = model.predict(vec.toarray())
     print(y_pred)
     
+    #モデルの表示
+    model.summary()
+    
     #正解率と損失のグラフの描画
     plot_history(history)
 
