@@ -163,3 +163,6 @@ amazon_reviews_multilingual_JP_v1_00.tsv
 #*.tsv
 #logs
 #*.log
+
+model.pth
+pytorch_model.bin
